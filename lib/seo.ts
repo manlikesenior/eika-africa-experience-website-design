@@ -52,6 +52,7 @@ export const generateSchemaMarkup = (type: string, data: any) => {
       }
 
     case "tour":
+      const priceValue = typeof data.price === "number" ? data.price : data.price.replace("From $", "")
       return {
         ...baseSchema,
         "@type": "TouristAttraction",
@@ -68,7 +69,7 @@ export const generateSchemaMarkup = (type: string, data: any) => {
         },
         offers: {
           "@type": "Offer",
-          price: data.price.replace("From $", ""),
+          price: priceValue,
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
         },

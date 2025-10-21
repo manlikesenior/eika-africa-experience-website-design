@@ -1,4 +1,6 @@
 export const createTourSchema = (tour: any, baseUrl: string) => {
+  const priceValue = typeof tour.price === "number" ? tour.price : tour.price.replace("From $", "")
+
   return {
     "@context": "https://schema.org",
     "@type": "TouristAttraction",
@@ -14,8 +16,8 @@ export const createTourSchema = (tour: any, baseUrl: string) => {
     },
     offers: {
       "@type": "AggregateOffer",
-      lowPrice: tour.price.replace("From $", ""),
-      highPrice: tour.price.replace("From $", ""),
+      lowPrice: priceValue,
+      highPrice: priceValue,
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: `${baseUrl}/booking?tourId=${tour.id}`,
