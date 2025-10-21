@@ -1,0 +1,25 @@
+# Robots.txt for Eika Africa Experience
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /.next
+Disallow: /private
+
+# Specific rules for Googlebot
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Specific rules for Bingbot
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+# Sitemaps
+Sitemap: https://www.eikafricaexperience.com/sitemap.xml
+Sitemap: https://www.eikafricaexperience.com/sitemap-tours.xml
+Sitemap: https://www.eikafricaexperience.com/sitemap-static.xml
+
+# Crawl-delay and Request-rate
+Request-rate: 30/60
