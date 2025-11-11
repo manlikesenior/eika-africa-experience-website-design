@@ -14,8 +14,15 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CalendarIcon, Phone, Mail, MapPin, Clock, Loader } from "lucide-react"
-import { format } from "date-fns"
 import { submitBooking } from "@/app/actions/bookings"
+
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+}
+
+const formatDateISO = (date: Date): string => {
+  return date.toISOString().split("T")[0]
+}
 
 // Tour data mapping
 const tourTitles: Record<string, string> = {
@@ -32,6 +39,7 @@ export default function BookingPage() {
   const [departureDate, setDepartureDate] = useState<Date>()
   const [returnDate, setReturnDate] = useState<Date>()
   const [selectedTour, setSelectedTour] = useState<string>("default")
+  const [tripTheme, setTripTheme] = useState<string>("Normal")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -55,9 +63,10 @@ export default function BookingPage() {
         email: formData.get("email") as string,
         phone: formData.get("phone") as string,
         country: formData.get("country") as string,
+        trip_theme: formData.get("tripTheme") as string,
         destination: formData.get("destination") as string,
-        departure_date: departureDate ? format(departureDate, "yyyy-MM-dd") : null,
-        return_date: returnDate ? format(returnDate, "yyyy-MM-dd") : null,
+        departure_date: departureDate ? formatDateISO(departureDate) : null,
+        return_date: returnDate ? formatDateISO(returnDate) : null,
         duration: formData.get("duration") as string,
         travelers: Number.parseInt(formData.get("travelers") as string) || 1,
         budget: formData.get("budget") as string,
@@ -207,6 +216,22 @@ export default function BookingPage() {
                   {/* Travel Details */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">Travel Details</h3>
+
+                    <div>
+                      <Label htmlFor="tripTheme">Trip Theme *</Label>
+                      <Select name="tripTheme" value={tripTheme} onValueChange={setTripTheme} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select trip theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Normal">Normal</SelectItem>
+                          <SelectItem value="Corporate">Corporate</SelectItem>
+                          <SelectItem value="Honeymooners">Honeymooners</SelectItem>
+                          <SelectItem value="Family">Family</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     <div>
                       <Label htmlFor="destination">Preferred Destination(s) *</Label>
                       <Select name="destination" required>
@@ -238,7 +263,7 @@ export default function BookingPage() {
                               className="w-full justify-start text-left font-normal bg-transparent"
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {departureDate ? format(departureDate, "PPP") : "Select date"}
+                              {departureDate ? formatDate(departureDate) : "Select date"}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0">
@@ -255,7 +280,7 @@ export default function BookingPage() {
                               className="w-full justify-start text-left font-normal bg-transparent"
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {returnDate ? format(returnDate, "PPP") : "Select date"}
+                              {returnDate ? formatDate(returnDate) : "Select date"}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0">
@@ -515,7 +540,7 @@ export default function BookingPage() {
                   <Link href="/experiences/3-days-masai-mara">
                     <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-amber-50 hover:border-amber-900 cursor-pointer transition">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Samburu%20Sunset.jpg-PM37vqDjxPTd1NUY1gTkvi9dV7WPfB.jpeg"
+                        src="/images/design-mode/Samburu%20Sunset.jpg.jpeg"
                         alt="Maasai Mara Safari"
                         width={60}
                         height={40}
@@ -531,7 +556,7 @@ export default function BookingPage() {
                   <Link href="/experiences/3-days-naivasha">
                     <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-amber-50 hover:border-amber-900 cursor-pointer transition">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Ewaso%20Ng%27iro.jpg-rVDkIPwU1y8OAL03GD7qPrjfhooQds.jpeg"
+                        src="/images/design-mode/Ewaso%20Ng%27iro.jpg.jpeg"
                         alt="Lake Naivasha"
                         width={60}
                         height={40}
@@ -547,7 +572,7 @@ export default function BookingPage() {
                   <Link href="/experiences/zanzibar-dar-es-salaam">
                     <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-amber-50 hover:border-amber-900 cursor-pointer transition">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/KICC%202.jpg-mBKF2Ch5BXrehspwCEuPcgImKIUBUz.jpeg"
+                        src="/images/design-mode/KICC%202.jpg.jpeg"
                         alt="Zanzibar & Dar"
                         width={60}
                         height={40}
@@ -563,7 +588,7 @@ export default function BookingPage() {
                   <Link href="/experiences/adventure-safari">
                     <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-amber-50 hover:border-amber-900 cursor-pointer transition">
                       <Image
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Ewaso%20Ng%27iro.jpg-rVDkIPwU1y8OAL03GD7qPrjfhooQds.jpeg"
+                        src="/images/design-mode/Ewaso%20Ng%27iro.jpg.jpeg"
                         alt="Adventure Safari"
                         width={60}
                         height={40}

@@ -187,7 +187,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/KICC1.jpg-zmFlfEIgrEPhhrgiLHg0eojiS2RUZa.jpeg"
+                src="/images/design-mode/KICC1.jpg.jpeg"
                 alt="Nairobi city view from KICC - showcasing Kenya's modern development"
                 width={600}
                 height={400}

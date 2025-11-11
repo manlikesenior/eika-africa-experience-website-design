@@ -9,6 +9,7 @@ interface BookingData {
   email: string
   phone: string
   country: string
+  trip_theme: string
   destination: string
   departure_date: string | null
   return_date: string | null
@@ -33,6 +34,7 @@ export async function submitBooking(data: BookingData) {
         email: data.email,
         phone: data.phone,
         country: data.country,
+        trip_theme: data.trip_theme,
         destination: data.destination,
         departure_date: data.departure_date,
         return_date: data.return_date,
