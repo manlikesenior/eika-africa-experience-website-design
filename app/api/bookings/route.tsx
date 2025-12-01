@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { Resend } from "resend"
 import { type NextRequest, NextResponse } from "next/server"
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,8 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send confirmation email to user
-    if (resend) {
-      const userEmailResult = await resend.emails.send({
+    const userEmailResult = await resend.emails.send({
       from: "Eika Africa <noreply@eikaafrica.com>",
       to: email,
       subject: "Booking Confirmation - Eika Africa Experience",
@@ -92,12 +91,12 @@ export async function POST(request: NextRequest) {
       `,
     })
 
-      if (userEmailResult.error) {
-        console.error("[v0] User email error:", userEmailResult.error)
-      }
+    if (userEmailResult.error) {
+      console.error("[v0] User email error:", userEmailResult.error)
+    }
 
-      // Send notification email to admin
-      const adminEmailResult = await resend.emails.send({
+    // Send notification email to admin
+    const adminEmailResult = await resend.emails.send({
       from: "Eika Africa <noreply@eikaafrica.com>",
       to: "info@eikaafrica.com",
       subject: `New Booking Request - ${fullName}`,
@@ -128,9 +127,8 @@ export async function POST(request: NextRequest) {
       `,
     })
 
-      if (adminEmailResult.error) {
-        console.error("[v0] Admin email error:", adminEmailResult.error)
-      }
+    if (adminEmailResult.error) {
+      console.error("[v0] Admin email error:", adminEmailResult.error)
     }
 
     return NextResponse.json(

@@ -69,3 +69,46 @@ export async function fetchTourById(id: string) {
     return null
   }
 }
+
+export async function createTour(tourData: {
+  title: string
+  location: string
+  duration: string
+  price: number
+  image_url: string
+  description: string
+  itinerary: string
+  highlights: string[]
+  inclusions: string[]
+  exclusions: string[]
+}) {
+  try {
+    const cookieStore = await cookies()
+    const supabase = createServerClient(supabaseUrl || "", supabaseAnonKey || "", {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          } catch {
+            // Handle cookie setting errors
+          }
+        },
+      },
+    })
+
+    const { data, error } = await supabase.from("tours").insert([tourData]).select()
+
+    if (error) {
+      console.error("Error creating tour:", error)
+      throw new Error(error.message)
+    }
+
+    return data?.[0] || null
+  } catch (error) {
+    console.error("Error in createTour:", error)
+    throw error
+  }
+}
