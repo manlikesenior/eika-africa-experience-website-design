@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { ImageUploader } from "@/components/ImageUploader"
 import { TourForm } from "@/components/TourForm"
-import { Upload, Plus, LogOut } from "lucide-react"
+import { BookingsTable } from "@/components/BookingsTable"
+import { Upload, Plus, LogOut, BookOpen, Image, Users, Settings } from "lucide-react"
 import { supabase } from "@/lib/auth"
 
 export default function AdminDashboard() {
@@ -65,11 +66,45 @@ export default function AdminDashboard() {
           </Button>
         </div>
 
-        <Tabs defaultValue="tours" className="space-y-6">
+        <Tabs defaultValue="bookings" className="space-y-6">
           <TabsList className="bg-white border">
-            <TabsTrigger value="tours">Tours</TabsTrigger>
-            <TabsTrigger value="media">Media Library</TabsTrigger>
+            <TabsTrigger value="bookings" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              <span>Bookings</span>
+            </TabsTrigger>
+            <TabsTrigger value="tours" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              <span>Tours</span>
+            </TabsTrigger>
+            <TabsTrigger value="media" className="flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              <span>Media</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2" disabled>
+              <Users className="h-4 w-4" />
+              <span>Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2" disabled>
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </TabsTrigger>
           </TabsList>
+
+          {/* Bookings Tab */}
+          <TabsContent value="bookings" className="space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Manage Bookings
+                </CardTitle>
+                <CardDescription>View and manage all tour bookings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BookingsTable />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Tours Tab */}
           <TabsContent value="tours" className="space-y-6">

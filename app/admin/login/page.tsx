@@ -44,6 +44,29 @@ export default function AdminLogin() {
     }
   }
 
+  const [showReset, setShowReset] = useState(false)
+  const [resetEmail, setResetEmail] = useState("")
+  const [resetMsg, setResetMsg] = useState("")
+  const [resetLoading, setResetLoading] = useState(false)
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setResetMsg("")
+    setResetLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail)
+      if (error) {
+        setResetMsg(error.message)
+      } else {
+        setResetMsg("Password reset email sent. Check your inbox.")
+      }
+    } catch (err: any) {
+      setResetMsg(err.message || "Error sending reset email")
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
@@ -53,45 +76,83 @@ export default function AdminLogin() {
             <CardDescription>Enter your credentials to access the dashboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-6">
-              {error && (
-                <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-800">{error}</p>
+            {!showReset ? (
+              <>
+                <form onSubmit={handleLogin} className="space-y-6">
+                  {error && (
+                    <div className="flex gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="admin@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+                <div className="flex justify-end mt-2">
+                  <button
+                    type="button"
+                    className="text-xs text-blue-600 hover:underline"
+                    onClick={() => setShowReset(true)}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign In"}
-              </Button>
-            </form>
-
+              </>
+            ) : (
+              <form onSubmit={handleResetPassword} className="space-y-6">
+                <div>
+                  <Label htmlFor="resetEmail">Enter your email to reset password</Label>
+                  <Input
+                    id="resetEmail"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                    disabled={resetLoading}
+                  />
+                </div>
+                {resetMsg && (
+                  <div className="p-2 text-sm rounded bg-blue-50 border border-blue-200 text-blue-900">{resetMsg}</div>
+                )}
+                <div className="flex gap-2">
+                  <Button type="submit" className="w-full" disabled={resetLoading}>
+                    {resetLoading ? "Sending..." : "Send Reset Email"}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setShowReset(false)} disabled={resetLoading}>
+                    Back to Login
+                  </Button>
+                </div>
+              </form>
+            )}
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-900">
                 <strong>Demo Credentials:</strong>

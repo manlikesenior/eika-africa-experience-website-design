@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { createTour } from "@/app/actions/tours"
 import { CheckCircle } from "lucide-react"
 
-export function TourForm({ onSuccess }: { onSuccess: () => void }) {
+export function TourForm({ onSuccessAction }: { onSuccessAction: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
@@ -25,11 +25,31 @@ export function TourForm({ onSuccess }: { onSuccess: () => void }) {
     highlights: "",
     inclusions: "",
     exclusions: "",
+    gallery: [] as string[]
   })
+  
+  const [galleryInput, setGalleryInput] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddGalleryImage = () => {
+    if (galleryInput.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        gallery: [...prev.gallery, galleryInput.trim()]
+      }))
+      setGalleryInput("")
+    }
+  }
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +59,11 @@ export function TourForm({ onSuccess }: { onSuccess: () => void }) {
     setSuccessMessage("")
 
     try {
+      // Basic validation
+      if (!formData.title || !formData.location || !formData.duration || !formData.price || !formData.image_url) {
+        throw new Error("Please fill in all required fields")
+      }
+
       // Parse array fields
       const highlights = formData.highlights
         .split("\n")
@@ -52,20 +77,23 @@ export function TourForm({ onSuccess }: { onSuccess: () => void }) {
         .split("\n")
         .map((e) => e.trim())
         .filter(Boolean)
+      const gallery = formData.gallery.filter(url => url.trim() !== '')
 
-      await createTour({
+      const result = await createTour({
         title: formData.title,
         location: formData.location,
         duration: formData.duration,
-        price: Number.parseFloat(formData.price),
+        price: formData.price,
         image_url: formData.image_url,
         description: formData.description,
         itinerary: formData.itinerary,
         highlights,
         inclusions,
         exclusions,
+        gallery
       })
-
+      
+      // If we get here, the tour was created successfully
       setSuccessMessage("Tour created successfully!")
       setFormData({
         title: "",
@@ -78,13 +106,12 @@ export function TourForm({ onSuccess }: { onSuccess: () => void }) {
         highlights: "",
         inclusions: "",
         exclusions: "",
+        gallery: []
       })
-      onSuccess()
-
-      setTimeout(() => setSuccessMessage(""), 3000)
+      onSuccessAction()
     } catch (error) {
       console.error("Error creating tour:", error)
-      setErrorMessage("Failed to create tour. Please try again.")
+      setErrorMessage(error instanceof Error ? error.message : "Failed to create tour. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -244,6 +271,43 @@ export function TourForm({ onSuccess }: { onSuccess: () => void }) {
       {errorMessage && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">{errorMessage}</div>
       )}
+
+      {/* Gallery */}
+      <div>
+        <Label htmlFor="gallery">Gallery Images (URLs)</Label>
+        <div className="flex gap-2">
+          <Input
+            id="gallery"
+            value={galleryInput}
+            onChange={(e) => setGalleryInput(e.target.value)}
+            placeholder="Enter image URL"
+          />
+          <Button 
+            type="button" 
+            onClick={handleAddGalleryImage}
+            variant="outline"
+          >
+            Add
+          </Button>
+        </div>
+        {formData.gallery.length > 0 && (
+          <div className="mt-2 space-y-2">
+            {formData.gallery.map((url, index) => (
+              <div key={index} className="flex items-center justify-between p-2 border rounded">
+                <span className="text-sm truncate max-w-xs">{url}</span>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleRemoveGalleryImage(index)}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Submit */}
       <Button type="submit" disabled={isSubmitting} className="bg-amber-900 hover:bg-amber-800 w-full py-6 text-lg">

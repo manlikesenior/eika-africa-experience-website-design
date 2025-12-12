@@ -74,14 +74,21 @@ export async function createTour(tourData: {
   title: string
   location: string
   duration: string
-  price: number
+  price: number | string  // Accept both number and string for flexibility
   image_url: string
   description: string
   itinerary: string
   highlights: string[]
   inclusions: string[]
   exclusions: string[]
+  gallery: string[]
 }) {
+  // Ensure price is a number
+  const tourDataToSend = {
+    ...tourData,
+    price: typeof tourData.price === 'string' ? parseFloat(tourData.price) : tourData.price,
+    gallery: tourData.gallery || []  // Ensure gallery is always an array
+  }
   try {
     const cookieStore = await cookies()
     const supabase = createServerClient(supabaseUrl || "", supabaseAnonKey || "", {
@@ -99,14 +106,20 @@ export async function createTour(tourData: {
       },
     })
 
-    const { data, error } = await supabase.from("tours").insert([tourData]).select()
+    const { data, error } = await supabase
+      .from("tours")
+      .insert([{
+        ...tourDataToSend,
+        price: Number(tourDataToSend.price)  // Ensure price is a number
+      }])
+      .select()
 
     if (error) {
       console.error("Error creating tour:", error)
-      throw new Error(error.message)
+      return { success: false, error: error.message }
     }
 
-    return data?.[0] || null
+    return { success: true, data: data?.[0] }
   } catch (error) {
     console.error("Error in createTour:", error)
     throw error
